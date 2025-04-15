@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Agriculture Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Defer script execution -->
+    <script type="module" src="dashboard.js" defer></script> 
+    <script src="cropdata.js"></script>
+    <link rel="stylesheet" href="calender.css">
+    <link rel="stylesheet" href="crop.css">
+   <link rel="stylesheet" href="weather.css">
+   <link rel="stylesheet" href="profile.css">
+<style>
+    :root {
+            --primary-color: #2d6a4f;
+            --secondary-color: #40916c;
+            --accent-color: #f5b041;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            color: var(--accent-color);
+        }
+
+        .add-session-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .add-session-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .watering-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .watering-filters select {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .watering-table-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .watering-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .watering-table th,
+        .watering-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .watering-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .watering-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-badge.completed {
+            background: #e3fcef;
+            color: #0d8f4f;
+        }
+
+        .status-badge.in-progress {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-badge.scheduled {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .btn-icon:hover {
+            background: #f8f9fa;
+        }
+
+        .watering-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+
+        .summary-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-period {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .watering-filters {
+                flex-direction: column;
+            }
+
+            .watering-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+</style>
+</head>
+<body class="light-mode"> <!-- Default to light mode -->
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-leaf sidebar-logo"></i> <!-- Logo Icon -->
+            <h2>Farm Panel</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#weather"><i class="fas fa-cloud-sun"></i> Weather</a>
+            <a href="#analytics"><i class="fas fa-chart-line"></i> Analytics</a>
+            <a href="#cropinfo"><i class="fas fa-crop"></i> crop info</a>
+            <a href="#calender"><i class="fas fa-calendar"></i> crop calender</a>
+            <a href="#profile"><i class="fas fa-user"></i> profile</a>
+            <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+            <!-- Add more links as needed -->
+        </nav>
+        <div class="sidebar-footer">
+            <button id="theme-toggle" class="theme-toggle-btn">
+                <i class="fas fa-moon"></i> <!-- Moon icon for dark mode -->
+                <span>Toggle Theme</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="content-header">
+            <!-- Search bar or other header elements can go here -->
+            <div class="user-info">
+                <span id="username">Welcome, User</span>
+                <button id="logout" class="logout-btn">Logout</button>
+            </div>
+        </header>
+        
+        <main>
+<!-- Dashboard Start -->
+<div id="dashboard-view">
+                <h2 class="content-title">Agriculture Dashboard</h2>
+                <!-- Sensor Data Cards -->
+                <div class="cards">
+                    <div class="card temperature-card">
+                        <i class="fas fa-thermometer-half card-icon"></i>
+                        <div>
+                            <h3>Temperature:</h3> 
+                            <p id="temperature">-- °C</p>
+                        </div>
+                    </div>
+                    <div class="card humidity-card">
+                        <i class="fas fa-tint card-icon"></i>
+                        <div>
+                            <h3>Humidity:</h3> 
+                            <p id="humidity">-- %</p>
+                        </div>
+                    </div>
+                    <div class="card soil-moisture-card">
+                        <i class="fas fa-seedling card-icon"></i>
+                        <div>
+                            <h3>Soil Moisture:</h3> 
+                            <p id="soil-moisture">-- %</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Charts -->
+                <div class="charts-container">
+                    <div class="chart-wrapper">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="soilMoistureChart"></canvas>
+                    </div>
+                </div>
+        
+               
+                <!-- Motor Control -->
+                <div class="motor-control">
+                    <button id="motor-on" class="motor-btn on">Turn Motor ON</button>
+                    <button id="motor-off" class="motor-btn off">Turn Motor OFF</button>
+                </div>
+</div>
+<!-- Dashboard end -->
+
+<!-- weather  start -->
+<div id="weather-view" class="view-hidden" >
+    <!-- <h2 class="content-title">Weather Forecast</h2> -->
+    <div class="container">
+        <div class="weather-card">
+            <div class="controls">
+                <select id="location" class="location-select">
+                    <option value="">Select Location</option>
+                    <option value="Surat,IN">Surat</option>
+                    <option value="Ayodhya,IN">Ayodhya</option>
+                    <option value="Ahmedabad,IN">Ahmedabad</option>
+                    <option value="Pune,IN">Pune</option>
+                    <option value="Kerala,IN">Kerala</option>
+                    <option value="Varanasi,IN">Varanasi</option>
+                </select>
+                <button onclick="fetchWeather()" class="fetch-btn">
+                    <i class="fas fa-sync-alt"></i> Get Weather Data
+                </button>
+            </div>
+
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Fetching weather data...</p>
+            </div>
+
+            <div class="weather-grid">
+                <div>
+                    <h3 class="forecast-title">7-Day Weather Forecast</h3>
+                    <table class="forecast-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>🌡️ Temp (°C)</th>
+                                <th>💧 Humidity (%)</th>
+                                <th>🌥️ Weather</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weather-forecast">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 2rem;">
+                                    Select a location and click "Get Weather Data"
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+<!-- weather  end -->
+
+            <div id="analytics-view" class="view-hidden">
+                <h2 class="content-title">Water Analysis</h2>
+                <div class="container">
+                   
+                
+                    <div class="watering-filters">
+                        <select class="form-input" id="farmFilter">
+                            <option value="">All Farms</option>
+                            <option value="main">Main Farm</option>
+                            <option value="north">North Farm</option>
+                            <option value="south">South Farm</option>
+                        </select>
+                        <select class="form-input" id="cropFilter">
+                            <option value="">All Crops</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="rice">Rice</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="sugarcane">Sugarcane</option>
+                        </select>
+                        <select class="form-input" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="in-progress">In Progress</option>
+                        </select>
+                    </div>
+                
+                    <div class="watering-table-container">
+                        <table class="watering-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Farm</th>
+                                    <th>Crop</th>
+                                    <th>Area (Acres)</th>
+                                    <th>Duration</th>
+                                    <th>Water Used (L)</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>20 Nov 2023</td>
+                                    <td>Main Farm</td>
+                                    <td>Wheat</td>
+                                    <td>25</td>
+                                    <td>4 hours</td>
+                                    <td>50,000</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                    <td>
+                                        <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button>
+                                        <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>25 Nov 2023</td>
+                                    <td>North Farm</td>
+                                    <td>Rice</td>
+                                    <td>15</td>
+                                    <td>6 hours</td>
+                                    <td>75,000</td>
+                                    <td><span class="status-badge in-progress">In Progress</span></td>
+                                    <td>
+                                        <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button>
+                                        <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>28 Nov 2023</td>
+                                    <td>South Farm</td>
+                                    <td>Cotton</td>
+                                    <td>20</td>
+                                    <td>5 hours</td>
+                                    <td>60,000</td>
+                                    <td><span class="status-badge scheduled">Scheduled</span></td>
+                                    <td>
+                                        <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button>
+                                        <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                
+                    <div class="watering-summary">
+                        <div class="summary-card">
+                            <div class="summary-title">Total Water Usage</div>
+                            <div class="summary-value">185,000 L</div>
+                            <div class="summary-period">Last 7 days</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-title">Average Duration</div>
+                            <div class="summary-value">5 hours</div>
+                            <div class="summary-period">Per Session</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-title">Efficiency Score</div>
+                            <div class="summary-value">92%</div>
+                            <div class="summary-period">Water Usage</div>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+
+<!-- crop information start -->
+<div id="cropinfo-view" class="view-hidden">
+                <h2 class="content-title">Analytics</h2>
+            <div class="container">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Region</label>
+                        <select class="filter-select" id="regionFilter">
+                            <option value="">All Regions</option>
+                            <option value="north">North India</option>
+                            <option value="south">South India</option>
+                            <option value="east">East India</option>
+                            <option value="west">West India</option>
+                            <option value="central">Central India</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Soil Type</label>
+                        <select class="filter-select" id="soilTypeFilter">
+                            <option value="">All Types</option>
+                            <option value="alluvial">Alluvial</option>
+                            <option value="black">Black</option>
+                            <option value="red">Red</option>
+                            <option value="laterite">Laterite</option>
+                            <option value="mountain">Mountain</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Crop Type</label>
+                        <select class="filter-select" id="cropTypeFilter">
+                            <option value="">All Crops</option>
+                            <option value="cereals">Cereals</option>
+                            <option value="pulses">Pulses</option>
+                            <option value="oilseeds">Oilseeds</option>
+                            <option value="cash">Cash Crops</option>
+                        </select>
+                    </div>
+                </div>
+            
+                <div class="soil-metrics-grid" id="soilMetricsGrid">
+                    <!-- Soil metrics cards will be generated by JavaScript -->
+                </div>
+            </div>
+
+</div>
+<!-- <--  crop information  end-->
+
+<!-- calender start -->
+<div id="calender-view" class="view-hidden">
+                <h2 class="content-title">Analytics</h2>
+                <div class="container">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label class="filter-label">Season</label>
+                            <select class="filter-select" id="seasonFilter">
+                                <option value="">All Seasons</option>
+                                <option value="kharif">Kharif</option>
+                                <option value="rabi">Rabi</option>
+                                <option value="zaid">Zaid</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Region</label>
+                            <select class="filter-select" id="regionFilter">
+                                <option value="">All Regions</option>
+                                <option value="north">North India</option>
+                                <option value="south">South India</option>
+                                <option value="east">East India</option>
+                                <option value="west">West India</option>
+                                <option value="central">Central India</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Water Requirement</label>
+                            <select class="filter-select" id="waterFilter">
+                                <option value="">All</option>
+                                <option value="low">Low</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                    </div>
+                
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="Search crops by name, region, or season..."
+                            id="searchInput">
+                    </div>
+                
+                    <div class="crop-grid" id="cropGrid">
+                        <!-- Crop cards will be generated by JavaScript -->
+                    </div>
+                </div>
+</div>
+<!-- calender end -->
+
+<!-- profile start -->
+<div id="profile-view" class="view-hidden">
+    <h2 class="content-title">profile</h2>
+    <div class="container">
+        <div class="profile-grid">
+            <div class="profile-sidebar">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-name">Saikiran  Rudra</div>
+                    <div class="profile-role">Progressive Farmer</div>
+                </div>
+    
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">1</div>
+                        <div class="stat-label">Farms</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Crops</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Years</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4.8</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                </div>
+    
+                <ul class="profile-menu">
+                    <li class="menu-item active" data-section="overview">
+                        <i class="fas fa-home"></i>
+                        Overview
+                    </li>
+                    <li class="menu-item" data-section="farms">
+                        <i class="fas fa-tractor"></i>
+                        Farms
+                    </li>
+                    <li class="menu-item" data-section="crops">
+                        <i class="fas fa-seedling"></i>
+                        Crops
+                    </li>
+                    <li class="menu-item" data-section="activity">
+                        <i class="fas fa-history"></i>
+                        Activity
+                    </li>
+                    <li class="menu-item" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </li>
+                </ul>
+            </div>
+    
+            <div class="profile-content">
+                <div class="content-section active" id="overview">
+                    <div class="section-title">
+                        <i class="fas fa-home"></i>
+                        Overview
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Contact</div>
+                            <div class="info-value">+91 98765 43210</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">Sai.rudra@example.com</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Location</div>
+                            <div class="info-value">Surat, India</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Experience</div>
+                            <div class="info-value">8 Years</div>
+                        </div>
+                    </div>
+    
+                    <div class="farm-details">
+                        <div class="section-title">
+                            <i class="fas fa-tractor"></i>
+                            Farm Summary
+                        </div>
+                        <div class="farm-card">
+                            <div class="farm-header">
+                                <div class="farm-name">Main Farm</div>
+                                <div class="farm-location">Ludhiana, Punjab</div>
+                            </div>
+                            <div class="farm-stats">
+                                <div class="farm-stat">
+                                    <div class="farm-stat-value">25 Acres</div>
+                                    <div class="farm-stat-label">Total Area</div>
+                                </div>
+                                <div class="farm-stat">
+                                    <div class="farm-stat-value">4</div>
+                                    <div class="farm-stat-label">Active Crops</div>
+                                </div>
+                                <div class="farm-stat">
+                                    <div class="farm-stat-value">2</div>
+                                    <div class="farm-stat-label">Workers</div>
+                                </div>
+                            </div>
+                            <div class="crop-list">
+                                <div class="crop-tag">Wheat</div>
+                                <div class="crop-tag">Rice</div>
+                                <div class="crop-tag">Cotton</div>
+                                <div class="crop-tag">Sugarcane</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="content-section" id="farms">
+                    <div class="section-title">
+                        <i class="fas fa-tractor"></i>
+                        Farms
+                    </div>
+                    <div class="farm-card">
+                        <div class="farm-header">
+                            <div class="farm-name">Main Farm</div>
+                            <div class="farm-location">Ludhiana, Punjab</div>
+                        </div>
+                        <div class="farm-stats">
+                            <div class="farm-stat">
+                                <div class="farm-stat-value">25 Acres</div>
+                                <div class="farm-stat-label">Total Area</div>
+                            </div>
+                            <div class="farm-stat">
+                                <div class="farm-stat-value">4</div>
+                                <div class="farm-stat-label">Active Crops</div>
+                            </div>
+                            <div class="farm-stat">
+                                <div class="farm-stat-value">2</div>
+                                <div class="farm-stat-label">Workers</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="content-section" id="crops">
+                    <div class="section-title">
+                        <i class="fas fa-seedling"></i>
+                        Crops
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Current Season</div>
+                            <div class="info-value">Rabi</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Main Crop</div>
+                            <div class="info-value">Wheat</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Planting Date</div>
+                            <div class="info-value">15 Nov 2023</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Expected Harvest</div>
+                            <div class="info-value">15 Apr 2024</div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="content-section" id="activity">
+                    <div class="section-title">
+                        <i class="fas fa-history"></i>
+                        Recent Activity
+                    </div>
+                    <div class="activity-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Wheat Planting</div>
+                                <div class="timeline-date">15 Nov 2023</div>
+                                <div class="timeline-description">Planted wheat in 25 acres using modern machinery</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Irrigation</div>
+                                <div class="timeline-date">20 Nov 2023</div>
+                                <div class="timeline-description">Completed first irrigation cycle for wheat crop</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-spray-can"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Pest Control</div>
+                                <div class="timeline-date">25 Nov 2023</div>
+                                <div class="timeline-description">Applied organic pest control measures</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="content-section" id="settings">
+                    <div class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </div>
+                    <form class="settings-form">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" value="Rajesh Kumar">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" value="rajesh.kumar@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-input" value="+91 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-input" value="Punjab, India">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">About</label>
+                            <textarea
+                                class="form-textarea">Progressive farmer with 8 years of experience in modern farming techniques.</textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- profile end -->
+
+<!-- setting  start -->
+<div id="settings-view" class="view-hidden">
+                <h2 class="content-title">Settings</h2>
+                <div class="settings-section card">
+                    <h3><i class="fas fa-palette"></i> Appearance</h3>
+                    <p>Adjust the look and feel of your dashboard.</p>
+                    <div class="setting-item">
+                        <span>Theme:</span>
+                        <!-- Theme toggle is already in the sidebar -->
+                        <span class="current-theme-display">Light / Dark (Use toggle in sidebar)</span>
+                    </div>
+                </div>
+                 <div class="settings-section card">
+                    <h3><i class="fas fa-user-circle"></i> Profile</h3>
+                     <div class="setting-item">
+                        <span>Username:</span>
+                        <span id="profile-username">Loading...</span>
+                        <!-- <span id="username">Loading...</span> -->
+
+                    </div>
+                    <!-- Add more settings here -->
+                </div>
+</div>
+<!-- setting  end -->
+
+
+        </main>
+    </div>
+
+
+    <!-- weatherjs start  -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        const apiKey = 'bc9015c1a2a3bc0e8e8300dc52001234';
+        let map;
+
+        async function fetchWeather() {
+            const location = document.getElementById('location').value;
+            if (!location) {
+                showError('Please select a location');
+                return;
+            }
+
+            showLoading();
+            try {
+                const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${location}&limit=1&appid=${apiKey}`;
+                const geoResponse = await fetch(geoUrl);
+                const geoData = await geoResponse.json();
+                if (!geoData.length) throw new Error('Location not found!');
+
+                const { lat, lon } = geoData[0];
+                updateMap(lat, lon);
+                await getWeatherForecast(lat, lon);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function getWeatherForecast(lat, lon) {
+            try {
+                const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+                const response = await fetch(forecastUrl);
+                const data = await response.json();
+                if (!data.list) throw new Error('Weather data unavailable!');
+
+                let forecastHtml = '';
+                for (let i = 0; i < data.list.length; i += 8) {
+                    const day = data.list[i];
+                    const date = new Date(day.dt * 1000).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    const temp = day.main.temp.toFixed(1);
+                    const humidity = day.main.humidity;
+                    const weatherDesc = day.weather[0].description;
+                    const weatherIcon = getWeatherIcon(day.weather[0].main);
+
+                    forecastHtml += `
+                            <tr>
+                                <td>${date}</td>
+                                <td><i class="fas ${weatherIcon} weather-icon"></i> ${temp}°C</td>
+                                <td><i class="fas fa-tint humidity"></i> ${humidity}%</td>
+                                <td>${weatherDesc}</td>
+                            </tr>`;
+                }
+                document.getElementById('weather-forecast').innerHTML = forecastHtml;
+            } catch (error) {
+                showError('Failed to fetch weather forecast');
+            }
+        }
+
+        function getWeatherIcon(weatherMain) {
+            switch (weatherMain.toLowerCase()) {
+                case 'clear': return 'fa-sun';
+                case 'clouds': return 'fa-cloud';
+                case 'rain': return 'fa-cloud-rain';
+                case 'snow': return 'fa-snowflake';
+                case 'thunderstorm': return 'fa-bolt';
+                case 'drizzle': return 'fa-cloud-drizzle';
+                default: return 'fa-cloud';
+            }
+        }
+
+        function showLoading() {
+            document.querySelector('.loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.querySelector('.loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('weather-forecast').innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #e74c3c; padding: 2rem;">
+                            <i class="fas fa-exclamation-circle"></i> ${message}
+                        </td>
+                    </tr>`;
+        }
+
+        function loadMap(lat = 21.1702, lon = 72.8311) {
+            if (map) {
+                map.remove();
+            }
+            map = L.map('map', {
+                zoomControl: true,
+                attributionControl: true
+            }).setView([lat, lon], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup('📍 Default Location')
+                .openPopup();
+        }
+
+        function updateMap(lat, lon) {
+            if (map) {
+                map.setView([lat, lon], 13);
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
+                L.marker([lat, lon]).addTo(map)
+                    .bindPopup('📍 Selected Location')
+                    .openPopup();
+            }
+        }
+
+        loadMap();
+    </script>
+    <!-- weatherjs end  -->
+
+<!-- calender start -->
+    <script>
+        function createCropCard(crop) {
+            return `
+                    <div class="crop-card">
+                        <div class="crop-header">
+                            <div class="crop-icon">
+                                <i class="fas ${crop.icon}"></i>
+                            </div>
+                            <div class="crop-title">
+                                <div class="crop-name">${crop.name}</div>
+                                <div class="crop-region">${crop.region}</div>
+                                <div class="crop-season ${crop.season.toLowerCase()}">${crop.season}</div>
+                            </div>
+                        </div>
+    
+                        <div class="section-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            Timeline
+                        </div>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-label">Planting</div>
+                                <div class="timeline-value">${crop.planting}</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-label">Harvesting</div>
+                                <div class="timeline-value">${crop.harvesting}</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-label">Duration</div>
+                                <div class="timeline-value">${crop.duration}</div>
+                            </div>
+                        </div>
+    
+                        <div class="section-title">
+                            <i class="fas fa-leaf"></i>
+                            Agronomic Info
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <i class="fas fa-tint info-icon"></i>
+                                <div>
+                                    <div class="info-label">Water</div>
+                                    <div class="info-value">${crop.water}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-mountain info-icon"></i>
+                                <div>
+                                    <div class="info-label">Soil</div>
+                                    <div class="info-value">${crop.soil}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-thermometer-half info-icon"></i>
+                                <div>
+                                    <div class="info-label">Temperature</div>
+                                    <div class="info-value">${crop.temperature}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-sun info-icon"></i>
+                                <div>
+                                    <div class="info-label">Sunlight</div>
+                                    <div class="info-value">${crop.sunlight}</div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="section-title">
+                            <i class="fas fa-seedling"></i>
+                            Popular Varieties
+                        </div>
+                        <div class="varieties">
+                            ${crop.varieties.map(v => `
+                                <div class="variety-item">
+                                    <div class="variety-name">${v.name}</div>
+                                    <div class="variety-region">${v.region}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+    
+                        <div class="section-title">
+                            <i class="fas fa-bug"></i>
+                            Common Pests
+                        </div>
+                        <div class="pest-info">
+                            ${crop.pests.map(p => `
+                                <div class="pest-item">
+                                    <i class="fas fa-bug pest-icon"></i>
+                                    <div>
+                                        <div class="pest-name">${p.name}</div>
+                                        <div class="pest-solution">${p.solution}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+    
+                        <div class="section-title">
+                            <i class="fas fa-chart-line"></i>
+                            Economic Info
+                        </div>
+                        <div class="economic-info">
+                            <div class="economic-item">
+                                <div class="economic-label">MSP</div>
+                                <div class="economic-value">${crop.economic.msp}</div>
+                            </div>
+                            <div class="economic-item">
+                                <div class="economic-label">Average Yield</div>
+                                <div class="economic-value">${crop.economic.yield}</div>
+                            </div>
+                            <div class="economic-item">
+                                <div class="economic-label">Market</div>
+                                <div class="economic-value">${crop.economic.market}</div>
+                            </div>
+                        </div>
+    
+                        <div class="section-title">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            Government Support
+                        </div>
+                        <div class="government-info">
+                            ${crop.schemes.map(s => `
+                                <div class="scheme-item">
+                                    <i class="fas fa-check-circle scheme-icon"></i>
+                                    <div>
+                                        <div class="scheme-name">${s.name}</div>
+                                        <div class="scheme-details">${s.details}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+        }
+
+        function renderCrops(cropsToRender) {
+            const cropGrid = document.getElementById('cropGrid');
+            cropGrid.innerHTML = cropsToRender.map(createCropCard).join('');
+        }
+
+        function filterCrops() {
+            const seasonFilter = document.getElementById('seasonFilter').value.toLowerCase();
+            const regionFilter = document.getElementById('regionFilter').value.toLowerCase();
+            const waterFilter = document.getElementById('waterFilter').value.toLowerCase();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            const filteredCrops = cropData.filter(crop => {
+                const matchesSeason = !seasonFilter || crop.season.toLowerCase() === seasonFilter;
+                const matchesRegion = !regionFilter || crop.region.toLowerCase().includes(regionFilter);
+                const matchesWater = !waterFilter || crop.water.toLowerCase() === waterFilter;
+                const matchesSearch = !searchTerm ||
+                    crop.name.toLowerCase().includes(searchTerm) ||
+                    crop.region.toLowerCase().includes(searchTerm) ||
+                    crop.season.toLowerCase().includes(searchTerm);
+
+                return matchesSeason && matchesRegion && matchesWater && matchesSearch;
+            });
+
+            renderCrops(filteredCrops);
+        }
+
+        // Event listeners for filters
+        document.getElementById('seasonFilter').addEventListener('change', filterCrops);
+        document.getElementById('regionFilter').addEventListener('change', filterCrops);
+        document.getElementById('waterFilter').addEventListener('change', filterCrops);
+        document.getElementById('searchInput').addEventListener('input', filterCrops);
+
+        // Initial render
+        renderCrops(cropData);
+    </script>
+<!-- calender end -->
+
+<!-- crop info start -->
+ <script>
+    const soilData = [
+        {
+            name: "Alluvial Soil",
+            region: "North India",
+            icon: "fa-mountain",
+            type: "alluvial",
+            metrics: {
+                ph: "6.5 - 7.5",
+                organicMatter: "0.5 - 1.5%",
+                nitrogen: "Medium",
+                phosphorus: "Medium",
+                potassium: "High",
+                moisture: "Good",
+                texture: "Sandy loam to clay loam"
+            },
+            recommendations: [
+                "Regular organic matter addition",
+                "Balanced NPK fertilization",
+                "Crop rotation with legumes",
+                "Proper drainage management"
+            ],
+            compatibleCrops: ["Wheat", "Rice", "Sugarcane", "Cotton", "Maize"]
+        },
+        {
+            name: "Black Soil",
+            region: "West India",
+            icon: "fa-mountain",
+            type: "black",
+            metrics: {
+                ph: "7.5 - 8.5",
+                organicMatter: "0.3 - 1.0%",
+                nitrogen: "Low",
+                phosphorus: "Medium",
+                potassium: "High",
+                moisture: "Excellent",
+                texture: "Clayey"
+            },
+            recommendations: [
+                "Regular organic matter addition",
+                "Nitrogen supplementation",
+                "Deep plowing",
+                "Water conservation practices"
+            ],
+            compatibleCrops: ["Cotton", "Sugarcane", "Jowar", "Bajra", "Groundnut"]
+        },
+        {
+            name: "Red Soil",
+            region: "South India",
+            icon: "fa-mountain",
+            type: "red",
+            metrics: {
+                ph: "5.5 - 6.5",
+                organicMatter: "0.2 - 0.8%",
+                nitrogen: "Low",
+                phosphorus: "Low",
+                potassium: "Medium",
+                moisture: "Poor",
+                texture: "Sandy to loamy"
+            },
+            recommendations: [
+                "Regular organic matter addition",
+                "Balanced fertilization",
+                "Mulching",
+                "Water conservation"
+            ],
+            compatibleCrops: ["Groundnut", "Pulses", "Millets", "Tobacco", "Fruits"]
+        },
+        {
+            name: "Laterite Soil",
+            region: "East India",
+            icon: "fa-mountain",
+            type: "laterite",
+            metrics: {
+                ph: "5.0 - 6.0",
+                organicMatter: "0.1 - 0.5%",
+                nitrogen: "Very Low",
+                phosphorus: "Low",
+                potassium: "Low",
+                moisture: "Poor",
+                texture: "Clayey to loamy"
+            },
+            recommendations: [
+                "Heavy organic matter addition",
+                "Balanced fertilization",
+                "Terracing",
+                "Erosion control"
+            ],
+            compatibleCrops: ["Tea", "Coffee", "Rubber", "Cashew", "Coconut"]
+        },
+        {
+            name: "Mountain Soil",
+            region: "Himalayan Region",
+            icon: "fa-mountain",
+            type: "mountain",
+            metrics: {
+                ph: "4.5 - 6.0",
+                organicMatter: "1.0 - 2.0%",
+                nitrogen: "Medium",
+                phosphorus: "Low",
+                potassium: "Medium",
+                moisture: "Good",
+                texture: "Sandy to loamy"
+            },
+            recommendations: [
+                "Organic farming practices",
+                "Terracing",
+                "Erosion control",
+                "Water conservation"
+            ],
+            compatibleCrops: ["Apples", "Pears", "Plums", "Cherries", "Walnuts"]
+        }
+    ];
+
+    function createSoilCard(soil) {
+        return `
+                <div class="soil-card">
+                    <div class="soil-header">
+                        <div class="soil-icon">
+                            <i class="fas ${soil.icon}"></i>
+                        </div>
+                        <div class="soil-title">
+                            <div class="soil-name">${soil.name}</div>
+                            <div class="soil-region">${soil.region}</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-section">
+                        <div class="metric-title">
+                            <i class="fas fa-chart-line"></i>
+                            Soil Metrics
+                        </div>
+                        <div class="metric-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">pH Level</div>
+                                <div class="metric-value">${soil.metrics.ph}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Organic Matter</div>
+                                <div class="metric-value">${soil.metrics.organicMatter}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Nitrogen</div>
+                                <div class="metric-value">${soil.metrics.nitrogen}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Phosphorus</div>
+                                <div class="metric-value">${soil.metrics.phosphorus}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Potassium</div>
+                                <div class="metric-value">${soil.metrics.potassium}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Moisture</div>
+                                <div class="metric-value">${soil.metrics.moisture}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Texture</div>
+                                <div class="metric-value">${soil.metrics.texture}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-section">
+                        <div class="metric-title">
+                            <i class="fas fa-lightbulb"></i>
+                            Recommendations
+                        </div>
+                        <div class="recommendations">
+                            ${soil.recommendations.map(rec => `
+                                <div class="recommendation-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>${rec}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="metric-section">
+                        <div class="metric-title">
+                            <i class="fas fa-seedling"></i>
+                            Compatible Crops
+                        </div>
+                        <div class="crop-list">
+                            ${soil.compatibleCrops.map(crop => `
+                                <div class="crop-tag">${crop}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+    }
+
+    function renderSoilMetrics(soilsToRender) {
+        const soilMetricsGrid = document.getElementById('soilMetricsGrid');
+        soilMetricsGrid.innerHTML = soilsToRender.map(createSoilCard).join('');
+    }
+
+    function filterSoils() {
+        const regionFilter = document.getElementById('regionFilter').value.toLowerCase();
+        const soilTypeFilter = document.getElementById('soilTypeFilter').value.toLowerCase();
+        const cropTypeFilter = document.getElementById('cropTypeFilter').value.toLowerCase();
+
+        const filteredSoils = soilData.filter(soil => {
+            const matchesRegion = !regionFilter || soil.region.toLowerCase().includes(regionFilter);
+            const matchesSoilType = !soilTypeFilter || soil.type.toLowerCase() === soilTypeFilter;
+            const matchesCropType = !cropTypeFilter || soil.compatibleCrops.some(crop =>
+                crop.toLowerCase().includes(cropTypeFilter)
+            );
+
+            return matchesRegion && matchesSoilType && matchesCropType;
+        });
+
+        renderSoilMetrics(filteredSoils);
+    }
+
+    // Event listeners for filters
+    document.getElementById('regionFilter').addEventListener('change', filterSoils);
+    document.getElementById('soilTypeFilter').addEventListener('change', filterSoils);
+    document.getElementById('cropTypeFilter').addEventListener('change', filterSoils);
+
+    // Initial render
+    renderSoilMetrics(soilData);
+</script>
+<!-- crop info end -->
+
+<!-- profile start -->
+<script>
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', () => {
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            // Add active class to clicked item
+            item.classList.add('active');
+
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected content section
+            const sectionId = item.getAttribute('data-section');
+            document.getElementById(sectionId).classList.add('active');
+        });
+    });
+</script>
+<!-- profile end -->
+
+<script>
+    // Add event listeners for filters
+    document.querySelectorAll('.watering-filters select').forEach(select => {
+        select.addEventListener('change', () => {
+            // Here you would typically filter the table data
+            console.log('Filter changed:', select.id, select.value);
+        });
+    });
+
+    // Add event listener for the "Add New Session" button
+    document.querySelector('.add-session-btn').addEventListener('click', () => {
+        // Here you would typically show a modal or navigate to a new page
+        console.log('Add new session clicked');
+    });
+
+    // Add event listeners for action buttons
+    document.querySelectorAll('.btn-icon').forEach(button => {
+        button.addEventListener('click', () => {
+            const action = button.getAttribute('title');
+            console.log(`${action} button clicked`);
+        });
+    });
+</script>
+
+
+
+</body>
+</html>

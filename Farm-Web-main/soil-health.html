@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Health Metrics - Smart Farming</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2d6a4f;
+            --secondary-color: #40916c;
+            --accent-color: #f5b041;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background-color: white;
+        }
+
+        .soil-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .soil-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .soil-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .soil-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .soil-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .soil-title {
+            flex: 1;
+        }
+
+        .soil-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .soil-region {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .metric-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric-title i {
+            color: var(--accent-color);
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .recommendations {
+            background: #e8f5e9;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-item i {
+            color: #2e7d32;
+        }
+
+        .crop-compatibility {
+            margin-top: 1.5rem;
+        }
+
+        .crop-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .crop-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .soil-metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h2>🌱 Soil Health Metrics</h2>
+    </header>
+
+    <div class="container">
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Region</label>
+                <select class="filter-select" id="regionFilter">
+                    <option value="">All Regions</option>
+                    <option value="north">North India</option>
+                    <option value="south">South India</option>
+                    <option value="east">East India</option>
+                    <option value="west">West India</option>
+                    <option value="central">Central India</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Soil Type</label>
+                <select class="filter-select" id="soilTypeFilter">
+                    <option value="">All Types</option>
+                    <option value="alluvial">Alluvial</option>
+                    <option value="black">Black</option>
+                    <option value="red">Red</option>
+                    <option value="laterite">Laterite</option>
+                    <option value="mountain">Mountain</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Crop Type</label>
+                <select class="filter-select" id="cropTypeFilter">
+                    <option value="">All Crops</option>
+                    <option value="cereals">Cereals</option>
+                    <option value="pulses">Pulses</option>
+                    <option value="oilseeds">Oilseeds</option>
+                    <option value="cash">Cash Crops</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="soil-metrics-grid" id="soilMetricsGrid">
+            <!-- Soil metrics cards will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-title">Soil Health Metrics 🌱</div>
+            <div class="footer-subtitle">Your guide to soil health and crop compatibility</div>
+        </div>
+    </footer>
+
+    <script>
+        const soilData = [
+            {
+                name: "Alluvial Soil",
+                region: "North India",
+                icon: "fa-mountain",
+                type: "alluvial",
+                metrics: {
+                    ph: "6.5 - 7.5",
+                    organicMatter: "0.5 - 1.5%",
+                    nitrogen: "Medium",
+                    phosphorus: "Medium",
+                    potassium: "High",
+                    moisture: "Good",
+                    texture: "Sandy loam to clay loam"
+                },
+                recommendations: [
+                    "Regular organic matter addition",
+                    "Balanced NPK fertilization",
+                    "Crop rotation with legumes",
+                    "Proper drainage management"
+                ],
+                compatibleCrops: ["Wheat", "Rice", "Sugarcane", "Cotton", "Maize"]
+            },
+            {
+                name: "Black Soil",
+                region: "West India",
+                icon: "fa-mountain",
+                type: "black",
+                metrics: {
+                    ph: "7.5 - 8.5",
+                    organicMatter: "0.3 - 1.0%",
+                    nitrogen: "Low",
+                    phosphorus: "Medium",
+                    potassium: "High",
+                    moisture: "Excellent",
+                    texture: "Clayey"
+                },
+                recommendations: [
+                    "Regular organic matter addition",
+                    "Nitrogen supplementation",
+                    "Deep plowing",
+                    "Water conservation practices"
+                ],
+                compatibleCrops: ["Cotton", "Sugarcane", "Jowar", "Bajra", "Groundnut"]
+            },
+            {
+                name: "Red Soil",
+                region: "South India",
+                icon: "fa-mountain",
+                type: "red",
+                metrics: {
+                    ph: "5.5 - 6.5",
+                    organicMatter: "0.2 - 0.8%",
+                    nitrogen: "Low",
+                    phosphorus: "Low",
+                    potassium: "Medium",
+                    moisture: "Poor",
+                    texture: "Sandy to loamy"
+                },
+                recommendations: [
+                    "Regular organic matter addition",
+                    "Balanced fertilization",
+                    "Mulching",
+                    "Water conservation"
+                ],
+                compatibleCrops: ["Groundnut", "Pulses", "Millets", "Tobacco", "Fruits"]
+            },
+            {
+                name: "Laterite Soil",
+                region: "East India",
+                icon: "fa-mountain",
+                type: "laterite",
+                metrics: {
+                    ph: "5.0 - 6.0",
+                    organicMatter: "0.1 - 0.5%",
+                    nitrogen: "Very Low",
+                    phosphorus: "Low",
+                    potassium: "Low",
+                    moisture: "Poor",
+                    texture: "Clayey to loamy"
+                },
+                recommendations: [
+                    "Heavy organic matter addition",
+                    "Balanced fertilization",
+                    "Terracing",
+                    "Erosion control"
+                ],
+                compatibleCrops: ["Tea", "Coffee", "Rubber", "Cashew", "Coconut"]
+            },
+            {
+                name: "Mountain Soil",
+                region: "Himalayan Region",
+                icon: "fa-mountain",
+                type: "mountain",
+                metrics: {
+                    ph: "4.5 - 6.0",
+                    organicMatter: "1.0 - 2.0%",
+                    nitrogen: "Medium",
+                    phosphorus: "Low",
+                    potassium: "Medium",
+                    moisture: "Good",
+                    texture: "Sandy to loamy"
+                },
+                recommendations: [
+                    "Organic farming practices",
+                    "Terracing",
+                    "Erosion control",
+                    "Water conservation"
+                ],
+                compatibleCrops: ["Apples", "Pears", "Plums", "Cherries", "Walnuts"]
+            }
+        ];
+
+        function createSoilCard(soil) {
+            return `
+                <div class="soil-card">
+                    <div class="soil-header">
+                        <div class="soil-icon">
+                            <i class="fas ${soil.icon}"></i>
+                        </div>
+                        <div class="soil-title">
+                            <div class="soil-name">${soil.name}</div>
+                            <div class="soil-region">${soil.region}</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-section">
+                        <div class="metric-title">
+                            <i class="fas fa-chart-line"></i>
+                            Soil Metrics
+                        </div>
+                        <div class="metric-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">pH Level</div>
+                                <div class="metric-value">${soil.metrics.ph}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Organic Matter</div>
+                                <div class="metric-value">${soil.metrics.organicMatter}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Nitrogen</div>
+                                <div class="metric-value">${soil.metrics.nitrogen}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Phosphorus</div>
+                                <div class="metric-value">${soil.metrics.phosphorus}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Potassium</div>
+                                <div class="metric-value">${soil.metrics.potassium}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Moisture</div>
+                                <div class="metric-value">${soil.metrics.moisture}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Texture</div>
+                                <div class="metric-value">${soil.metrics.texture}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-section">
+                        <div class="metric-title">
+                            <i class="fas fa-lightbulb"></i>
+                            Recommendations
+                        </div>
+                        <div class="recommendations">
+                            ${soil.recommendations.map(rec => `
+                                <div class="recommendation-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>${rec}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="metric-section">
+                        <div class="metric-title">
+                            <i class="fas fa-seedling"></i>
+                            Compatible Crops
+                        </div>
+                        <div class="crop-list">
+                            ${soil.compatibleCrops.map(crop => `
+                                <div class="crop-tag">${crop}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSoilMetrics(soilsToRender) {
+            const soilMetricsGrid = document.getElementById('soilMetricsGrid');
+            soilMetricsGrid.innerHTML = soilsToRender.map(createSoilCard).join('');
+        }
+
+        function filterSoils() {
+            const regionFilter = document.getElementById('regionFilter').value.toLowerCase();
+            const soilTypeFilter = document.getElementById('soilTypeFilter').value.toLowerCase();
+            const cropTypeFilter = document.getElementById('cropTypeFilter').value.toLowerCase();
+
+            const filteredSoils = soilData.filter(soil => {
+                const matchesRegion = !regionFilter || soil.region.toLowerCase().includes(regionFilter);
+                const matchesSoilType = !soilTypeFilter || soil.type.toLowerCase() === soilTypeFilter;
+                const matchesCropType = !cropTypeFilter || soil.compatibleCrops.some(crop => 
+                    crop.toLowerCase().includes(cropTypeFilter)
+                );
+
+                return matchesRegion && matchesSoilType && matchesCropType;
+            });
+
+            renderSoilMetrics(filteredSoils);
+        }
+
+        // Event listeners for filters
+        document.getElementById('regionFilter').addEventListener('change', filterSoils);
+        document.getElementById('soilTypeFilter').addEventListener('change', filterSoils);
+        document.getElementById('cropTypeFilter').addEventListener('change', filterSoils);
+
+        // Initial render
+        renderSoilMetrics(soilData);
+    </script>
+</body>
+</html> 

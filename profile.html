@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Profile - Smart Farming</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+   <link rel="stylesheet" href="profile.css">
+</head>
+
+<body>
+    <header class="header">
+        <h2>👨‍🌾 Farmer Profile</h2>
+    </header>
+
+    <div class="container">
+        <div class="profile-grid">
+            <div class="profile-sidebar">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-name">Rajesh Kumar</div>
+                    <div class="profile-role">Progressive Farmer</div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Farms</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Crops</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Years</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4.8</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                </div>
+
+                <ul class="profile-menu">
+                    <li class="menu-item active" data-section="overview">
+                        <i class="fas fa-home"></i>
+                        Overview
+                    </li>
+                    <li class="menu-item" data-section="farms">
+                        <i class="fas fa-tractor"></i>
+                        Farms
+                    </li>
+                    <li class="menu-item" data-section="crops">
+                        <i class="fas fa-seedling"></i>
+                        Crops
+                    </li>
+                    <li class="menu-item" data-section="activity">
+                        <i class="fas fa-history"></i>
+                        Activity
+                    </li>
+                    <li class="menu-item" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </li>
+                </ul>
+            </div>
+
+            <div class="profile-content">
+                <div class="content-section active" id="overview">
+                    <div class="section-title">
+                        <i class="fas fa-home"></i>
+                        Overview
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Contact</div>
+                            <div class="info-value">+91 98765 43210</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">rajesh.kumar@example.com</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Location</div>
+                            <div class="info-value">Punjab, India</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Experience</div>
+                            <div class="info-value">8 Years</div>
+                        </div>
+                    </div>
+
+                    <div class="farm-details">
+                        <div class="section-title">
+                            <i class="fas fa-tractor"></i>
+                            Farm Summary
+                        </div>
+                        <div class="farm-card">
+                            <div class="farm-header">
+                                <div class="farm-name">Main Farm</div>
+                                <div class="farm-location">Ludhiana, Punjab</div>
+                            </div>
+                            <div class="farm-stats">
+                                <div class="farm-stat">
+                                    <div class="farm-stat-value">25 Acres</div>
+                                    <div class="farm-stat-label">Total Area</div>
+                                </div>
+                                <div class="farm-stat">
+                                    <div class="farm-stat-value">4</div>
+                                    <div class="farm-stat-label">Active Crops</div>
+                                </div>
+                                <div class="farm-stat">
+                                    <div class="farm-stat-value">2</div>
+                                    <div class="farm-stat-label">Workers</div>
+                                </div>
+                            </div>
+                            <div class="crop-list">
+                                <div class="crop-tag">Wheat</div>
+                                <div class="crop-tag">Rice</div>
+                                <div class="crop-tag">Cotton</div>
+                                <div class="crop-tag">Sugarcane</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section" id="farms">
+                    <div class="section-title">
+                        <i class="fas fa-tractor"></i>
+                        Farms
+                    </div>
+                    <div class="farm-card">
+                        <div class="farm-header">
+                            <div class="farm-name">Main Farm</div>
+                            <div class="farm-location">Ludhiana, Punjab</div>
+                        </div>
+                        <div class="farm-stats">
+                            <div class="farm-stat">
+                                <div class="farm-stat-value">25 Acres</div>
+                                <div class="farm-stat-label">Total Area</div>
+                            </div>
+                            <div class="farm-stat">
+                                <div class="farm-stat-value">4</div>
+                                <div class="farm-stat-label">Active Crops</div>
+                            </div>
+                            <div class="farm-stat">
+                                <div class="farm-stat-value">2</div>
+                                <div class="farm-stat-label">Workers</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section" id="crops">
+                    <div class="section-title">
+                        <i class="fas fa-seedling"></i>
+                        Crops
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Current Season</div>
+                            <div class="info-value">Rabi</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Main Crop</div>
+                            <div class="info-value">Wheat</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Planting Date</div>
+                            <div class="info-value">15 Nov 2023</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Expected Harvest</div>
+                            <div class="info-value">15 Apr 2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section" id="activity">
+                    <div class="section-title">
+                        <i class="fas fa-history"></i>
+                        Recent Activity
+                    </div>
+                    <div class="activity-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Wheat Planting</div>
+                                <div class="timeline-date">15 Nov 2023</div>
+                                <div class="timeline-description">Planted wheat in 25 acres using modern machinery</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Irrigation</div>
+                                <div class="timeline-date">20 Nov 2023</div>
+                                <div class="timeline-description">Completed first irrigation cycle for wheat crop</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-spray-can"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Pest Control</div>
+                                <div class="timeline-date">25 Nov 2023</div>
+                                <div class="timeline-description">Applied organic pest control measures</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section" id="settings">
+                    <div class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </div>
+                    <form class="settings-form">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" value="Rajesh Kumar">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" value="rajesh.kumar@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-input" value="+91 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-input" value="Punjab, India">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">About</label>
+                            <textarea
+                                class="form-textarea">Progressive farmer with 8 years of experience in modern farming techniques.</textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all menu items
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                // Add active class to clicked item
+                item.classList.add('active');
+
+                // Hide all content sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Show selected content section
+                const sectionId = item.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

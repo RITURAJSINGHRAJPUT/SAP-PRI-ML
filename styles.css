@@ -1,0 +1,176 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('assets/farm4.jpg') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Use min-height to ensure background covers viewport */
+    margin: 0;
+    background-color: #f0f4f0; /* Fallback background color */
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Add a subtle overlay for better text contrast */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1); /* Light overlay */
+    z-index: -1; /* Place behind content */
+}
+
+/* Center Authentication Box */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Use min-height for flexibility */
+    padding: 20px; /* Add padding for smaller screens */
+    box-sizing: border-box;
+}
+
+/* Login & Register Box */
+.auth-box {
+    background: rgba(255, 255, 255, 0.95); /* Slightly increased opacity */
+    padding: 40px; /* Increased padding */
+    border-radius: 12px; /* Slightly larger radius */
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.18); /* Adjusted shadow */
+    text-align: center;
+    width: 100%; /* Start with full width */
+    max-width: 400px; /* Set a max-width */
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    animation: fadeIn 0.8s ease-out; /* Add fade-in animation */
+    box-sizing: border-box;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hover Effect */
+.auth-box:hover {
+    transform: translateY(-5px); /* Lift effect */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+/* Logo */
+.logo {
+    width: 90px; /* Slightly smaller logo */
+    margin-bottom: 20px;
+}
+
+/* Heading */
+h2 {
+    color: #4a6d4d; /* Darker, muted green */
+    font-weight: 600;
+    margin-bottom: 25px; /* Increased spacing */
+    font-size: 24px;
+}
+
+/* Input Fields */
+input {
+    width: 100%;
+    padding: 12px 15px; /* Adjust padding */
+    margin: 12px 0;
+    border: 1px solid #ccc; /* Lighter border */
+    border-radius: 6px; /* Slightly less rounded */
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: #fff; /* Solid white background */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+input:focus {
+    border-color: #6a994e; /* Green focus border */
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(106, 153, 78, 0.2); /* Subtle focus ring */
+    background: #fff;
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    background: linear-gradient(135deg, #6a994e, #8bc34a); /* Green gradient */
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600; /* Bolder text */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px; /* Add some margin */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Button shadow */
+    box-sizing: border-box;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #5a8a3e, #7cb33a); /* Darker gradient on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+}
+
+/* Toggle Links */
+.toggle {
+    margin-top: 20px; /* Increased spacing */
+    font-size: 14px;
+}
+
+.toggle a {
+    color: #6a994e; /* Match primary green */
+    text-decoration: none;
+    font-weight: 500; /* Medium weight */
+    transition: color 0.3s ease;
+}
+
+.toggle a:hover {
+    color: #4a6d4d; /* Darker green on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .auth-box {
+        padding: 25px; /* Reduce padding on small screens */
+        width: 90%; /* Adjust width */
+        max-width: none; /* Remove max-width for smaller screens */
+    }
+
+    h2 {
+        font-size: 22px; /* Slightly smaller heading */
+        margin-bottom: 20px;
+    }
+
+    .logo {
+        width: 80px; /* Smaller logo */
+        margin-bottom: 15px;
+    }
+
+    input {
+        padding: 10px 12px;
+    }
+
+    .btn {
+        padding: 10px;
+        font-size: 15px;
+    }
+
+    .toggle {
+        margin-top: 15px;
+        font-size: 13px;
+    }
+}
