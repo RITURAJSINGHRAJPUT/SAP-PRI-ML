@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-import { getDatabase, ref, onValue , set } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
 // ✅ Firebase Configuration
 const firebaseConfig = {
@@ -20,4 +20,4 @@ const db = getDatabase(app);  // ✅ Initialize Realtime Database
 // const signOut = getsignout 
 
 // ✅ Export Required Modules
-export { app, auth, db, ref, onValue , signOut , set };
+export { app, auth, db, ref, onValue, signOut, set };

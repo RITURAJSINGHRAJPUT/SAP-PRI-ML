@@ -2,7 +2,7 @@
 import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 import { app } from "./firebase-config.js";
-import { generateIrrigationSchedule } from "./schedule.js"; // Local schedule.js
+// import { generateIrrigationSchedule } from "./schedule.js"; // Local schedule.js
 
 // ✅ Initialize Firebase Services
 const auth = getAuth(app);
@@ -32,7 +32,7 @@ const profileUsernameElement = document.getElementById('profile-username');
 const UsernameElement = document.getElementById('username');
 
 // Analytics elements (Example: if you add a humidity chart)
-const humidityCtx = document.getElementById("humidityChart")?.getContext("2d"); 
+const humidityCtx = document.getElementById("humidityChart")?.getContext("2d");
 let humidityChart; // Placeholder for humidity chart instance
 
 // --- Theme Toggling Logic --- 
@@ -77,7 +77,7 @@ const switchView = (viewId) => {
         if (viewId === 'dashboard-view') titleText = 'Agriculture Dashboard';
         if (viewId === 'analytics-view') titleText = 'Analytics';
         if (viewId === 'settings-view') titleText = 'Settings';
-        
+
         document.querySelectorAll('#' + viewId + ' .content-title').forEach(title => {
             title.textContent = titleText;
         });
@@ -113,7 +113,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         const username = user.displayName || user.email.split("@")[0] || "User";
         usernameElement.textContent = `Welcome, ${username}`;
-        if (profileUsernameElement) { 
+        if (profileUsernameElement) {
             profileUsernameElement.textContent = username;
         }
     } else {
@@ -124,7 +124,7 @@ onAuthStateChanged(auth, (user) => {
 // ✅ Logout Function
 logoutBtn.addEventListener("click", () => {
     signOut(auth)
-        .then(() => window.location.href = "index.html")
+        .then(() => window.location.href = "login.html")
         .catch(error => alert("Logout failed: " + error.message));
 });
 
@@ -132,62 +132,6 @@ logoutBtn.addEventListener("click", () => {
 motorOnBtn.addEventListener("click", () => alert("Motor turned ON!"));
 motorOffBtn.addEventListener("click", () => alert("Motor turned OFF!"));
 
-// ✅ Fetch Real-time Sensor Data & Update UI
-onValue(ref(db, "sensor"), async (snapshot) => {
-    if (!snapshot.exists()) {
-        console.warn("No sensor data found.");
-        return;
-    }
-
-    const data = snapshot.val();
-    console.log("Fetched Sensor Data:", data);
-
-    const soilMoisturePercentage = Math.round((1 - data.soilMoisture / 4095) * 100);
-
-    tempElement.textContent = `${data.temperature} °C`;
-    humidityElement.textContent = `${data.humidity} %`;
-    soilMoistureElement.textContent = `${soilMoisturePercentage} %`;
-
-    updateCharts({ 
-        temperature: data.temperature, 
-        soilMoisture: soilMoisturePercentage, 
-        humidity: data.humidity 
-    });
-
-    // Fetch irrigation prediction from Flask backend
-    try {
-        const response = await fetch('http://127.0.0.1:5000/predict', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                soilMoisture: soilMoisturePercentage,
-                humidity: data.humidity,
-                temperature: data.temperature,
-                cropType: 'wheat' // Default crop type, can be made dynamic
-            })
-        });
-
-        const prediction = await response.json();
-        
-        // Update motor control buttons based on prediction
-        if (prediction.irrigationNeeded) {
-            motorOnBtn.classList.add('active');
-            motorOffBtn.classList.remove('active');
-            // You can also update the UI to show the recommended water amount
-            console.log(`Irrigation needed. Recommended water amount: ${prediction.waterAmount}mm`);
-        } else {
-            motorOnBtn.classList.remove('active');
-            motorOffBtn.classList.add('active');
-        }
-    } catch (error) {
-        console.error('Error fetching irrigation prediction:', error);
-    }
-
-    const schedules = generateIrrigationSchedule(soilMoisturePercentage, data.humidity);
-    displayIrrigationSchedule(schedules);
-});
 
 // ✅ Initialize Charts
 const tempCtx = document.getElementById("tempChart").getContext("2d");
@@ -258,7 +202,7 @@ function updateCharts(data) {
     soilChart.data.datasets[0].data.push(data.soilMoisture);
     soilChart.update();
 
-    if (humidityChart && document.getElementById('analytics-view').offsetParent !== null) { 
+    if (humidityChart && document.getElementById('analytics-view').offsetParent !== null) {
         if (humidityChart.data.labels.length >= MAX_POINTS) {
             humidityChart.data.labels.shift();
             humidityChart.data.datasets[0].data.shift();
@@ -268,6 +212,75 @@ function updateCharts(data) {
         humidityChart.update();
     }
 }
+
+// ✅ Mobile: Click Outside to Close Sidebar
+document.addEventListener('click', function (e) {
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.querySelector('.mobile-nav-toggle');
+    if (sidebar && toggle && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+        document.body.classList.remove('sidebar-open');
+    }
+});
+
+// -------------------------------------advances system code development under process ----------------------------------------------------------------------------------
+
+// ✅ Fetch Real-time Sensor Data & Update UI 
+onValue(ref(db, "sensor"), async (snapshot) => {
+    if (!snapshot.exists()) {
+        console.warn("No sensor data found.");
+        return;
+    }
+
+    const data = snapshot.val();
+    console.log("Fetched Sensor Data:", data);
+
+    const soilMoisturePercentage = Math.round((1 - data.soilMoisture / 4095) * 100);
+
+    tempElement.textContent = `${data.temperature} °C`;
+    humidityElement.textContent = `${data.humidity} %`;
+    soilMoistureElement.textContent = `${soilMoisturePercentage} %`;
+
+    updateCharts({
+        temperature: data.temperature,
+        soilMoisture: soilMoisturePercentage,
+        humidity: data.humidity
+    });
+
+    // Fetch irrigation prediction from Flask backend  -- no--
+    try {
+        const response = await fetch('http://127.0.0.1:5000/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                soilMoisture: soilMoisturePercentage,
+                humidity: data.humidity,
+                temperature: data.temperature,
+                cropType: 'wheat' // Default crop type, can be made dynamic
+            })
+        });
+
+        const prediction = await response.json();
+
+        // Update motor control buttons based on prediction
+        if (prediction.irrigationNeeded) {
+            motorOnBtn.classList.add('active');
+            motorOffBtn.classList.remove('active');
+            // You can also update the UI to show the recommended water amount
+            console.log(`Irrigation needed. Recommended water amount: ${prediction.waterAmount}mm`);
+        } else {
+            motorOnBtn.classList.remove('active');
+            motorOffBtn.classList.add('active');
+        }
+    } catch (error) {
+        console.error('Error fetching irrigation prediction:', error);
+    }
+
+    const schedules = generateIrrigationSchedule(soilMoisturePercentage, data.humidity);
+    displayIrrigationSchedule(schedules);
+});
+
 
 // ✅ Display Next 5 Irrigation Schedules
 function displayIrrigationSchedule(schedules) {
@@ -284,11 +297,3 @@ function displayIrrigationSchedule(schedules) {
     });
 }
 
-// ✅ Mobile: Click Outside to Close Sidebar
-document.addEventListener('click', function (e) {
-    const sidebar = document.querySelector('.sidebar');
-    const toggle = document.querySelector('.mobile-nav-toggle');
-    if (sidebar && toggle && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
-        document.body.classList.remove('sidebar-open');
-    }
-});

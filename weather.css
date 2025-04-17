@@ -49,6 +49,7 @@
             padding: 2rem;
             margin-bottom: 2rem;
             transition: var(--transition);
+            margin-top: 0.8rem;
         }
     
         .controls {
